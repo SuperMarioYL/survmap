@@ -1,0 +1,100 @@
+{
+  "schema": 1,
+  "name": "survmap",
+  "github": "https://github.com/SuperMarioYL/survmap",
+  "host": "survmap.lei6393.com",
+  "lang": {
+    "primary": "zh",
+    "toggle": true
+  },
+  "accent": [
+    "#e6a144",
+    "#c97c2d",
+    "#f0c674"
+  ],
+  "hero": {
+    "eyebrow": {
+      "zh": "会话回放 · 生存归因 · 一条命令",
+      "en": "Session Replay · Survival Attribution · One Command"
+    },
+    "headline": {
+      "zh": "你的 Agent 改了那么多\n到底哪几行活到了最后",
+      "en": "Your agent wrote a lot\nWhich lines actually survived"
+    },
+    "sub": {
+      "zh": "把一个编码 Agent 会话的每一轮改动，按 git HEAD 归因——存活、改写、还是消亡，一眼看清。",
+      "en": "Score every turn of a coding-agent session by git-HEAD survival: survived, churned, or partial — at a glance."
+    },
+    "command": "survmap score session.jsonl --repo ."
+  },
+  "advantages": [
+    {
+      "title": {
+        "zh": "一轮一行，存活还是废弃",
+        "en": "Per-turn, per-line survival"
+      },
+      "body": {
+        "zh": "解析完整会话日志，逐行 blame 到当前 HEAD——加的代码是活着的、被改写了、还是已经消失。",
+        "en": "Parse a finished session log, blame each added line against the repo's current HEAD — survived, churned, or gone."
+      },
+      "chips": [
+        "› JSONL 解析",
+        "› go-git blame",
+        "› 存活/改写/消亡"
+      ]
+    },
+    {
+      "title": {
+        "zh": "红绿热力图，一眼定位浪费",
+        "en": "Red/green heatmap, spot waste instantly"
+      },
+      "body": {
+        "zh": "终端红绿热力图，哪些轮次在白改、哪些轮次真有产出，不用翻日志。",
+        "en": "Terminal red/green heatmap — which turns were wasted, which were productive, without reading logs."
+      },
+      "chips": [
+        "› 终端热力图",
+        "› 交互浏览",
+        "› HTML 导出 (m2)"
+      ]
+    },
+    {
+      "title": {
+        "zh": "单二进制，信创内网也能跑",
+        "en": "Single binary, runs on air-gapped boxes"
+      },
+      "body": {
+        "zh": "纯 Go 编译，不依赖系统 git，零联网零账号——信创气隙盒上直接运行。",
+        "en": "Pure-Go single binary, no system git, zero network, zero accounts — runs on air-gapped boxes."
+      },
+      "chips": [
+        "› 纯 Go",
+        "› 零联网",
+        "› 零账号"
+      ]
+    }
+  ],
+  "scene": {
+    "kind": "particle-field"
+  },
+  "cta": {
+    "headline": {
+      "zh": "下一个会话，别再白改",
+      "en": "Next session, stop guessing"
+    },
+    "sub": {
+      "zh": "一条命令，看清你的 Agent 到底产出了什么。",
+      "en": "One command, see what your agent actually shipped."
+    },
+    "button": {
+      "zh": "开始使用",
+      "en": "Get started"
+    }
+  },
+  "footer": {
+    "tag": {
+      "zh": "MIT 开源 · 单二进制 · 信创可用",
+      "en": "MIT open source · single binary · air-gap ready"
+    }
+  }
+}
