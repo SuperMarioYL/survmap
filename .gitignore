@@ -1,0 +1,25 @@
+# build scratch
+.builder_*
+.build_metadata*
+.spawn.*
+.stage_*
+
+# editor / agent scratch
+.claude/
+CLAUDE.md
+
+# release staging
+dist/
+
+# go build artifacts
+survmap
+survmap.exe
+*.exe
+*.test
+*.out
+coverage.txt
+coverage.html
+
+# os noise
+.DS_Store
+Thumbs.db

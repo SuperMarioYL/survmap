@@ -1,0 +1,13 @@
+{"version":3,"term":{"cols":80,"rows":24},"timestamp":1786781161,"idle_time_limit":2.0,"command":"bash /tmp/surv_demo_run.sh","env":{"SHELL":"/bin/zsh"}}
+[0.013, "o", "$ go build -o /tmp/survmap . && echo ok\r\n"]
+[0.160, "o", "ok\r\n"]
+[1.015, "o", "\r\n$ rm -rf /tmp/demo && mkdir -p /tmp/demo && cp examples/repo/main.go examples/sample.jsonl /tmp/demo/ && cd /tmp/demo && git init -q && git add . && git -c user.name=demo -c user.email=demo@x commit -qm init && echo \"demo repo ready\"\r\n"]
+[0.111, "o", "demo repo ready\r\n"]
+[1.006, "o", "\r\n$ survmap score sample.jsonl --repo .\r\n"]
+[1.351, "o", "\u001b]11;?\u001b\\\u001b[6n"]
+[5.004, "o", "Survmap — survival attribution for sample.jsonl against HEAD 640ff62\r\n\r\nTURN   FILE                                       TOOL         ADD  SURV  CHRN  STATUS\r\n────────────────────────────────────────────────────────────────────────────────────────────────\r\n1      main.go                                    Write          8     6     2  partial\r\n2      main.go                                    Edit           2     0     2  churned\r\n────────────────────────────────────────────────────────────────────────────────────────────────\r\nSession: 2 turns · 6/10 lines survived (60.0%) · 1 wasted turns (50.0% of scored)\r\n=> 40% of added lin"]
+[0.000, "o", "es were churn (1 of 2 turns all-churned).\r\n"]
+[1.019, "o", "\r\n$ survmap heatmap sample.jsonl --repo .\r\n"]
+[1.038, "o", "\u001b]11;?\u001b\\\u001b[6n"]
+[5.006, "o", "Survival heatmap — sample.jsonl vs HEAD 640ff62\r\n\r\n  1 ██████████████████░░░░░░    6/8    partial  main.go\r\n  2 ░░░░░░░░░░░░░░░░░░░░░░░░    0/2    churned  main.go\r\n════════════════════════════════════════════════════════════\r\n6/10 lines survived (60.0%)  ·  40% churn\r\n"]
+[2.018, "x", "0"]

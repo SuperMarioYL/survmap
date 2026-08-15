@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 360" width="880" height="360"
+     font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif"
+     role="img" aria-label="Survmap 架构：session.jsonl → 解析器 → 归因核心 → go-git blame → 渲染器，repo at HEAD 喂入归因核心">
+  <defs>
+    <marker id="ah-l" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#B9B9C2"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="880" height="360" fill="#F5F5F7"/>
+  <text x="440" y="40" text-anchor="middle" font-size="13" font-weight="600" fill="#6E6E73">一个二进制 · 三个进程内模块 · 不依赖宿主 git CLI</text>
+
+  <!-- static connectors -->
+  <g stroke="#C9C9D0" stroke-width="1.5" fill="none">
+    <line x1="190" y1="180" x2="240" y2="180" marker-end="url(#ah-l)"/>
+    <line x1="410" y1="180" x2="460" y2="180" marker-end="url(#ah-l)"/>
+    <line x1="630" y1="180" x2="680" y2="180" marker-end="url(#ah-l)"/>
+    <line x1="325" y1="250" x2="325" y2="220" marker-end="url(#ah-l)"/>
+  </g>
+
+  <!-- marching dashes (data flow) -->
+  <g stroke-width="1.5" fill="none" stroke-linecap="round">
+    <line x1="190" y1="180" x2="236" y2="180" stroke="#0071E3" stroke-opacity="0.5" stroke-dasharray="6 10">
+      <animate attributeName="stroke-dashoffset" from="32" to="0" dur="1.6s" repeatCount="indefinite"/>
+    </line>
+    <line x1="410" y1="180" x2="456" y2="180" stroke="#5E5CE6" stroke-opacity="0.5" stroke-dasharray="6 10">
+      <animate attributeName="stroke-dashoffset" from="32" to="0" dur="1.6s" begin="-0.4s" repeatCount="indefinite"/>
+    </line>
+    <line x1="630" y1="180" x2="676" y2="180" stroke="#10A37F" stroke-opacity="0.5" stroke-dasharray="6 10">
+      <animate attributeName="stroke-dashoffset" from="32" to="0" dur="1.6s" begin="-0.8s" repeatCount="indefinite"/>
+    </line>
+    <line x1="325" y1="250" x2="325" y2="224" stroke="#8E8E93" stroke-opacity="0.5" stroke-dasharray="6 10">
+      <animate attributeName="stroke-dashoffset" from="32" to="0" dur="1.6s" begin="-1.2s" repeatCount="indefinite"/>
+    </line>
+  </g>
+
+  <!-- packet dots -->
+  <g>
+    <circle r="3" fill="#0071E3">
+      <animateMotion path="M190,180 L236,180" dur="2.4s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.85;1" dur="2.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle r="3" fill="#5E5CE6">
+      <animateMotion path="M410,180 L456,180" dur="2.4s" begin="-0.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.85;1" dur="2.4s" begin="-0.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle r="3" fill="#10A37F">
+      <animateMotion path="M630,180 L676,180" dur="2.4s" begin="-1.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.85;1" dur="2.4s" begin="-1.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle r="3" fill="#8E8E93">
+      <animateMotion path="M325,250 L325,224" dur="2.4s" begin="-1.8s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.85;1" dur="2.4s" begin="-1.8s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- nodes -->
+  <g>
+    <rect x="20" y="140" width="170" height="80" rx="15" fill="#0071E3" fill-opacity="0.10" stroke="#0071E3" stroke-width="1.5">
+      <animate attributeName="fill-opacity" values="0.10;0.18;0.10" keyTimes="0;0.5;1" dur="3.2s"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" repeatCount="indefinite"/>
+    </rect>
+    <text x="105" y="172" text-anchor="middle" font-size="14" font-weight="600" fill="#0A4F9E">Session parser</text>
+    <text x="105" y="192" text-anchor="middle" font-size="11" fill="#0A4F9E">JSONL → []Turn</text>
+
+    <rect x="240" y="140" width="170" height="80" rx="15" fill="#5E5CE6" fill-opacity="0.10" stroke="#5E5CE6" stroke-width="1.5">
+      <animate attributeName="fill-opacity" values="0.10;0.18;0.10" keyTimes="0;0.5;1" dur="3.2s" begin="-0.8s"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" repeatCount="indefinite"/>
+    </rect>
+    <text x="325" y="172" text-anchor="middle" font-size="14" font-weight="600" fill="#4B3FC4">Attribution core</text>
+    <text x="325" y="192" text-anchor="middle" font-size="11" fill="#4B3FC4">turn → HEAD survival</text>
+
+    <rect x="460" y="140" width="170" height="80" rx="15" fill="#10A37F" fill-opacity="0.10" stroke="#10A37F" stroke-width="1.5">
+      <animate attributeName="fill-opacity" values="0.10;0.18;0.10" keyTimes="0;0.5;1" dur="3.2s" begin="-1.6s"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" repeatCount="indefinite"/>
+    </rect>
+    <text x="545" y="172" text-anchor="middle" font-size="14" font-weight="600" fill="#0B6B53">go-git blame</text>
+    <text x="545" y="192" text-anchor="middle" font-size="11" fill="#0B6B53">oracle = HEAD</text>
+
+    <rect x="680" y="140" width="170" height="80" rx="15" fill="#0071E3" fill-opacity="0.10" stroke="#0071E3" stroke-width="1.5">
+      <animate attributeName="fill-opacity" values="0.10;0.18;0.10" keyTimes="0;0.5;1" dur="3.2s" begin="-2.4s"
+               calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" repeatCount="indefinite"/>
+    </rect>
+    <text x="765" y="172" text-anchor="middle" font-size="14" font-weight="600" fill="#0A4F9E">Renderer</text>
+    <text x="765" y="192" text-anchor="middle" font-size="11" fill="#0A4F9E">TUI / HTML</text>
+
+    <rect x="240" y="250" width="170" height="46" rx="12" fill="#8E8E93" fill-opacity="0.10" stroke="#8E8E93" stroke-width="1.5"/>
+    <text x="325" y="278" text-anchor="middle" font-size="12" font-weight="600" fill="#4A4A52">repo at HEAD (git)</text>
+  </g>
+</svg>
