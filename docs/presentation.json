@@ -1,0 +1,78 @@
+{
+  "name": "survmap",
+  "tagline": "See which recorded edits remain in HEAD.",
+  "architecture": {
+    "title": "How Survmap works",
+    "nodes": [
+      {
+        "title": "Transcript edits",
+        "detail": "internal/session"
+      },
+      {
+        "title": "HEAD content",
+        "detail": "internal/git"
+      },
+      {
+        "title": "Ordered line matches",
+        "detail": "internal/attribution"
+      },
+      {
+        "title": "Score / heatmap",
+        "detail": "internal/render"
+      }
+    ],
+    "edges": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        2,
+        3
+      ]
+    ]
+  },
+  "process": {
+    "title": "From input to a useful result",
+    "steps": [
+      {
+        "title": "Read two turns",
+        "detail": "Three substantive added lines"
+      },
+      {
+        "title": "Match HEAD lines",
+        "detail": "Ordered content comparison"
+      },
+      {
+        "title": "Aggregate status",
+        "detail": "Partial and churned turns"
+      }
+    ],
+    "result": "One of three supplied substantive lines remains; turn-1 is partial and turn-2 is churned."
+  },
+  "integrations": {
+    "title": "Supported input and output routes",
+    "items": [
+      {
+        "title": "Claude JSONL",
+        "detail": "Recorded file mutation calls"
+      },
+      {
+        "title": "Git HEAD",
+        "detail": "Current committed file content"
+      },
+      {
+        "title": "Terminal view",
+        "detail": "Per-turn table and heatmap"
+      },
+      {
+        "title": "HTML",
+        "detail": "Shareable rendered report"
+      }
+    ]
+  }
+}

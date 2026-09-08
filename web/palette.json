@@ -1,0 +1,38 @@
+{
+  "mode": "auto",
+  "id": "e656b1-e76a76-f6acf6-892265547adb",
+  "identity": "https://github.com/supermarioyl/survmap",
+  "primary": "#e656b1",
+  "secondary": "#e76a76",
+  "highlight": "#f6acf6",
+  "dark": {
+    "bg": "#0a0710",
+    "panel": "#13101c",
+    "code": "#140d19",
+    "ink": "#fdeefd",
+    "muted": "#b29cba",
+    "line": "#3a1833",
+    "primary": "#e656b1",
+    "secondary": "#e76a76",
+    "highlight": "#f6acf6",
+    "accent": "#e656b1",
+    "buttonStart": "#c24895",
+    "buttonEnd": "#bd5660",
+    "buttonText": "#ffffff"
+  },
+  "light": {
+    "bg": "#fef9fc",
+    "panel": "#fef7fb",
+    "code": "#fdf3fa",
+    "ink": "#271628",
+    "muted": "#725e7d",
+    "line": "#f7cbe7",
+    "primary": "#b9458e",
+    "secondary": "#b4525c",
+    "highlight": "#8d638d",
+    "accent": "#b9458e",
+    "buttonStart": "#c24895",
+    "buttonEnd": "#bd5660",
+    "buttonText": "#ffffff"
+  }
+}

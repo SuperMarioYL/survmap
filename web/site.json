@@ -1,100 +1,215 @@
 {
-  "schema": 1,
+  "schema": 3,
   "name": "survmap",
   "github": "https://github.com/SuperMarioYL/survmap",
   "host": "survmap.lei6393.com",
+  "palette": "auto",
   "lang": {
-    "primary": "zh",
+    "primary": "en",
     "toggle": true
   },
-  "accent": [
-    "#e6a144",
-    "#c97c2d",
-    "#f0c674"
-  ],
+  "meta": {
+    "visual_style": "neon-particle",
+    "demo_source": "docs/demo-results.json"
+  },
   "hero": {
-    "eyebrow": {
-      "zh": "会话回放 · 生存归因 · 一条命令",
-      "en": "Session Replay · Survival Attribution · One Command"
-    },
     "headline": {
-      "zh": "你的 Agent 改了那么多\n到底哪几行活到了最后",
-      "en": "Your agent wrote a lot\nWhich lines actually survived"
+      "en": "See which recorded edits remain in HEAD.",
+      "zh": "看清记录的编辑哪些留在 HEAD。"
     },
     "sub": {
-      "zh": "把一个编码 Agent 会话的每一轮改动，按 git HEAD 归因——存活、改写、还是消亡，一眼看清。",
-      "en": "Score every turn of a coding-agent session by git-HEAD survival: survived, churned, or partial — at a glance."
+      "en": "Survmap extracts file edits from a saved Claude Code transcript and compares their substantive lines with the repository’s current HEAD.",
+      "zh": "Survmap 从保存的 Claude Code 轨迹提取文件编辑，将其中实质内容行与仓库当前 HEAD 比较。"
     },
-    "command": "survmap score session.jsonl --repo ."
+    "href": "#quickstart"
   },
   "advantages": [
     {
       "title": {
-        "zh": "一轮一行，存活还是废弃",
-        "en": "Per-turn, per-line survival"
+        "en": "Inspect intermediate work",
+        "zh": "检查中间工作"
       },
       "body": {
-        "zh": "解析完整会话日志，逐行 blame 到当前 HEAD——加的代码是活着的、被改写了、还是已经消失。",
-        "en": "Parse a finished session log, blame each added line against the repo's current HEAD — survived, churned, or gone."
-      },
-      "chips": [
-        "› JSONL 解析",
-        "› go-git blame",
-        "› 存活/改写/消亡"
-      ]
+        "en": "Scores refer back to specific edit turns.",
+        "zh": "评分对应具体编辑轮次。"
+      }
     },
     {
       "title": {
-        "zh": "红绿热力图，一眼定位浪费",
-        "en": "Red/green heatmap, spot waste instantly"
+        "en": "Use content evidence",
+        "zh": "使用内容证据"
       },
       "body": {
-        "zh": "终端红绿热力图，哪些轮次在白改、哪些轮次真有产出，不用翻日志。",
-        "en": "Terminal red/green heatmap — which turns were wasted, which were productive, without reading logs."
-      },
-      "chips": [
-        "› 终端热力图",
-        "› 交互浏览",
-        "› HTML 导出 (m2)"
-      ]
+        "en": "Matches retain paths and HEAD line information.",
+        "zh": "匹配保留路径与 HEAD 行信息。"
+      }
     },
     {
       "title": {
-        "zh": "单二进制，信创内网也能跑",
-        "en": "Single binary, runs on air-gapped boxes"
+        "en": "Keep analysis local",
+        "zh": "本地分析"
       },
       "body": {
-        "zh": "纯 Go 编译，不依赖系统 git，零联网零账号——信创气隙盒上直接运行。",
-        "en": "Pure-Go single binary, no system git, zero network, zero accounts — runs on air-gapped boxes."
+        "en": "The scorer needs no model request.",
+        "zh": "评分器无需模型请求。"
+      }
+    }
+  ],
+  "demo": {
+    "title": {
+      "en": "Run it on a complete example",
+      "zh": "运行完整示例"
+    },
+    "note": {
+      "en": "Two explicit synthetic edit turns are compared with supplied HEAD lines through the production scorer.",
+      "zh": "通过生产评分器，把两轮明确合成编辑与提供的 HEAD 行比较。"
+    },
+    "source": "https://github.com/SuperMarioYL/survmap/blob/main/docs/demo-results.json",
+    "steps": [
+      {
+        "label": "Recorded run",
+        "body": "Production content-presence scorer over two explicit synthetic turns and supplied HEAD lines; no real repository history or productivity measurement.",
+        "command": "go run ./examples/presentation-demo",
+        "output": "turn-1: partial; survived=1 churned=1\nturn-2: churned; survived=0 churned=1\ntotal: 1/3 substantive lines present",
+        "image": "/assets/presentation/demo-0-light.svg",
+        "imageDark": "/assets/presentation/demo-0-dark.svg"
+      }
+    ]
+  },
+  "quickstart": {
+    "title": {
+      "en": "Try it locally",
+      "zh": "本地上手"
+    },
+    "body": {
+      "en": "Two explicit synthetic edit turns are compared with supplied HEAD lines through the production scorer.",
+      "zh": "通过生产评分器，把两轮明确合成编辑与提供的 HEAD 行比较。"
+    },
+    "steps": [
+      {
+        "title": {
+          "en": "Install from source",
+          "zh": "从源码安装"
+        },
+        "code": "git clone https://github.com/SuperMarioYL/survmap.git\ncd survmap\ngo build ."
       },
-      "chips": [
-        "› 纯 Go",
-        "› 零联网",
-        "› 零账号"
-      ]
+      {
+        "title": {
+          "en": "Run the included example",
+          "zh": "运行随仓示例"
+        },
+        "code": "go run ./examples/presentation-demo"
+      }
+    ]
+  },
+  "limitations": [
+    {
+      "en": "Content survival is not a productivity or value measurement. Similar lines can exist for unrelated reasons.",
+      "zh": "内容存留不等于生产力或价值；相似内容也可能因无关原因存在。"
+    },
+    {
+      "en": "The parser supports Claude Code’s recorded tool-use shape; arbitrary Codex transcripts are not established as supported.",
+      "zh": "解析器支持 Claude Code 的 tool-use 记录形状，不代表任意 Codex 轨迹均受支持。"
+    },
+    {
+      "en": "The offline demo supplies explicit synthetic HEAD lines. It does not test a repository history walk.",
+      "zh": "离线示例显式提供合成 HEAD 行，不测试仓库历史遍历。"
     }
   ],
   "scene": {
-    "kind": "particle-field"
+    "kind": "neon-graph",
+    "fallback": "/assets/presentation/scene-dark.svg",
+    "fallbackLight": "/assets/presentation/scene-light.svg"
   },
-  "cta": {
-    "headline": {
-      "zh": "下一个会话，别再白改",
-      "en": "Next session, stop guessing"
+  "story": {
+    "intro": {
+      "title": {
+        "en": "A concrete task",
+        "zh": "从实际任务出发"
+      },
+      "body": {
+        "en": "The final diff hides intermediate rewrites. A per-turn content-presence report helps locate where work was retained or replaced, so you can inspect those turns directly.",
+        "zh": "最终 diff 隐去了中间改写过程。逐轮内容存留报告帮助定位保留或替换的工作，便于回到相应轮次检查。"
+      }
     },
-    "sub": {
-      "zh": "一条命令，看清你的 Agent 到底产出了什么。",
-      "en": "One command, see what your agent actually shipped."
-    },
-    "button": {
-      "zh": "开始使用",
-      "en": "Get started"
-    }
-  },
-  "footer": {
-    "tag": {
-      "zh": "MIT 开源 · 单二进制 · 信创可用",
-      "en": "MIT open source · single binary · air-gap ready"
-    }
+    "sections": [
+      {
+        "title": {
+          "en": "Follow the operation",
+          "zh": "处理过程"
+        },
+        "body": {
+          "en": "The session parser extracts Write, Edit, MultiEdit and NotebookEdit records. The Git reader obtains HEAD content and best-effort blame data. The scorer matches substantive lines in order, then aggregates survived, churned, partial and skipped turns.",
+          "zh": "会话解析器提取 Write、Edit、MultiEdit 与 NotebookEdit；Git 读取器获取 HEAD 内容与尽力解析的 blame 数据。评分器按顺序匹配实质内容行，汇总 survived、churned、partial 和 skipped。"
+        },
+        "image": {
+          "light": "/assets/presentation/process-light.svg",
+          "dark": "/assets/presentation/process-dark.svg",
+          "alt": {
+            "en": "Follow the operation",
+            "zh": "处理过程"
+          }
+        }
+      },
+      {
+        "title": {
+          "en": "How Survmap works",
+          "zh": "Survmap 的工作方式"
+        },
+        "body": {
+          "en": "The session parser extracts Write, Edit, MultiEdit and NotebookEdit records. The Git reader obtains HEAD content and best-effort blame data. The scorer matches substantive lines in order, then aggregates survived, churned, partial and skipped turns.",
+          "zh": "会话解析器提取 Write、Edit、MultiEdit 与 NotebookEdit；Git 读取器获取 HEAD 内容与尽力解析的 blame 数据。评分器按顺序匹配实质内容行，汇总 survived、churned、partial 和 skipped。"
+        },
+        "image": {
+          "light": "/assets/presentation/architecture-light.svg",
+          "dark": "/assets/presentation/architecture-dark.svg",
+          "alt": {
+            "en": "How Survmap works",
+            "zh": "Survmap 的工作方式"
+          }
+        }
+      },
+      {
+        "title": {
+          "en": "Connect the pieces",
+          "zh": "输入与输出"
+        },
+        "body": {
+          "en": "The following routes are implemented in the source. Choose the input that matches your task and keep the resulting artifact with your project.",
+          "zh": "以下路径已有源码实现。按任务选择输入，并把生成的结果与项目一起保存。"
+        },
+        "image": {
+          "light": "/assets/presentation/integrations-light.svg",
+          "dark": "/assets/presentation/integrations-dark.svg",
+          "alt": {
+            "en": "Connect the pieces",
+            "zh": "输入与输出"
+          }
+        }
+      }
+    ],
+    "details": [
+      {
+        "title": {
+          "en": "Configuration",
+          "zh": "配置"
+        },
+        "body": {
+          "en": "--repo/-r selects the repository root; use the actual repository corresponding to the transcript. Only committed HEAD content is used. Blank lines and bare braces are excluded from scoring; trailing whitespace is ignored in line comparison.",
+          "zh": "--repo/-r 指定仓库根目录，应使用轨迹对应的实际仓库。比较使用已提交的 HEAD 内容；空行和单独花括号不参与计分，行末空白在比较时忽略。"
+        }
+      },
+      {
+        "title": {
+          "en": "Further use",
+          "zh": "进一步使用"
+        },
+        "body": {
+          "en": "The CLI exposes the following operations. Commands after the example use your own paths or identifiers.",
+          "zh": "CLI 提供以下操作。示例之外的命令需要替换成你的文件路径或标识。"
+        },
+        "code": "go run . score examples/sample.jsonl --repo /path/to/your/repo\ngo run . heatmap examples/sample.jsonl --repo /path/to/your/repo\ngo run . heatmap examples/sample.jsonl --repo /path/to/your/repo --html survival.html"
+      }
+    ]
   }
 }

@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "source_revision": "d8aec83a925dac494e5c444674ad1a7193aa3db2",
+  "scope": "Production content-presence scorer over two explicit synthetic turns and supplied HEAD lines; no real repository history or productivity measurement.",
+  "steps": [
+    {
+      "label": "Recorded run",
+      "body": "Production content-presence scorer over two explicit synthetic turns and supplied HEAD lines; no real repository history or productivity measurement.",
+      "command": "go run ./examples/presentation-demo",
+      "output": "turn-1: partial; survived=1 churned=1\nturn-2: churned; survived=0 churned=1\ntotal: 1/3 substantive lines present"
+    }
+  ]
+}
