@@ -115,11 +115,15 @@ func TestScoreAgainstHEAD_Ratio(t *testing.T) {
 
 func TestMatchInOrder_Dedup(t *testing.T) {
 	// Two identical added lines but only one survives at HEAD.
-	added := []string{"x", "x"}
-	head := bl("x")
-	got := matchInOrder(added, head)
+	c := newHeadClaims(bl("x"))
+	got := c.match([]string{"x", "x"})
 	if got[0] != 0 || got[1] != -1 {
 		t.Fatalf("got %v want [0 -1]", got)
+	}
+	// A later edit re-adding the same content cannot re-claim the head line.
+	got = c.match([]string{"x"})
+	if got[0] != -1 {
+		t.Fatalf("re-claim got %v want [-1]", got)
 	}
 }
 

@@ -71,6 +71,10 @@ type SessionSurvivalMap struct {
 // a real git repository.
 func ScoreAgainstHEAD(turns []session.Turn, headFiles map[string][]git.BlameLine, headSHA string) SessionSurvivalMap {
 	m := SessionSurvivalMap{HeadSHA: headSHA}
+	// claims holds the per-file matching state so every head line is claimed at
+	// most once per session: content re-added by a later turn (or context lines
+	// repeated in a later Edit's new_string) must not count as survived twice.
+	claims := make(map[string]*headClaims)
 	for ti, t := range turns {
 		score := SurvivalScore{TurnID: t.ID}
 		if score.TurnID == "" {
@@ -80,15 +84,18 @@ func ScoreAgainstHEAD(turns []session.Turn, headFiles map[string][]git.BlameLine
 			score.Ts = t.Ts.Format("2006-01-02T15:04:05Z07:00")
 		}
 		for _, e := range t.Edits {
-			head, _ := headFiles[e.Path]
-			headSub := filterBlame(head)
+			c, ok := claims[e.Path]
+			if !ok {
+				c = newHeadClaims(headFiles[e.Path])
+				claims[e.Path] = c
+			}
 			addedSub := substantiveStrings(e.AddedLines)
-			matched := matchInOrder(addedSub, headSub)
+			matched := c.match(addedSub)
 			for i, al := range addedSub {
 				ev := BlameEvidence{Path: e.Path, Tool: e.Tool, LineNo: -1, Content: al}
 				if matched[i] >= 0 {
-					ev.LineNo = headSub[matched[i]].LineNo
-					ev.CommitSHA = headSub[matched[i]].CommitSHA
+					ev.LineNo = c.head[matched[i]].LineNo
+					ev.CommitSHA = c.head[matched[i]].CommitSHA
 					ev.Survived = true
 				}
 				score.Evidence = append(score.Evidence, ev)
@@ -138,21 +145,40 @@ func Score(turns []session.Turn, repo *git.Repo) (SessionSurvivalMap, error) {
 	return ScoreAgainstHEAD(turns, headFiles, headSHA), nil
 }
 
-// matchInOrder returns, for each added line, the index in head it matches as an
-// order-preserving subsequence (each head line consumed at most once) or -1.
-// A miss leaves the head cursor untouched so a later line can still match.
-// Matching is on right-trimmed content so trailing whitespace / CRLF noise
-// does not flip a verdict.
-func matchInOrder(added []string, head []git.BlameLine) []int {
+// headClaims is the per-file matching state for one scoring pass: the
+// substantive head lines plus which of them an earlier edit already claimed.
+// Each head line can be claimed at most once per session, so identical content
+// added by several turns is only ever counted as survived once.
+type headClaims struct {
+	head    []git.BlameLine
+	claimed []bool
+}
+
+func newHeadClaims(head []git.BlameLine) *headClaims {
+	sub := filterBlame(head)
+	return &headClaims{head: sub, claimed: make([]bool, len(sub))}
+}
+
+// match returns, for each added line, the index in head it matches as an
+// order-preserving subsequence or -1. Within one call each head line is
+// consumed at most once; across calls (the edits of a session) a claimed line
+// is skipped, never re-claimed. A miss leaves the cursor untouched so a later
+// line can still match. Matching is on right-trimmed content so trailing
+// whitespace / CRLF noise does not flip a verdict.
+func (c *headClaims) match(added []string) []int {
 	res := make([]int, len(added))
 	for i := range res {
 		res[i] = -1
 	}
 	h := 0
 	for i, al := range added {
-		for j := h; j < len(head); j++ {
-			if lineEq(al, head[j].Content) {
+		for j := h; j < len(c.head); j++ {
+			if c.claimed[j] {
+				continue
+			}
+			if lineEq(al, c.head[j].Content) {
 				res[i] = j
+				c.claimed[j] = true
 				h = j + 1
 				break
 			}
