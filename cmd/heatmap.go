@@ -10,9 +10,9 @@ import (
 )
 
 // NewHeatmapCmd builds the `survmap heatmap` subcommand: re-score the session
-// and render a red/green survival heatmap. In m1 the default render is a plain
+// and render a red/green survival heatmap. The default render is a plain
 // colored terminal heatmap; --interactive wraps it in a tiny bubbletea viewer,
-// and --html is reserved for the m2 standalone-HTML renderer.
+// and --html writes a standalone, shareable HTML heatmap.
 func NewHeatmapCmd() *cobra.Command {
 	var repoPath, htmlOut string
 	var interactive bool
@@ -21,8 +21,9 @@ func NewHeatmapCmd() *cobra.Command {
 		Short: "Render a red/green survival heatmap",
 		Long: `Heatmap re-scores the session and renders a red/green survival heatmap:
 green turns produced lines that survived to HEAD, red turns were churn. The
-terminal heatmap ships in m1; the standalone HTML renderer and the richer
-interactive TUI are m2 roadmap items.`,
+terminal heatmap prints by default; --interactive runs a minimal bubbletea
+viewer (quits on q/esc), and --html writes a standalone shareable HTML heatmap
+(inline CSS, no external assets).`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runHeatmap(args[0], repoPath, htmlOut, interactive)
@@ -30,7 +31,7 @@ interactive TUI are m2 roadmap items.`,
 	}
 	cmd.Flags().StringVarP(&repoPath, "repo", "r", ".", "path to the git repo (worktree root)")
 	cmd.Flags().BoolVar(&interactive, "interactive", false, "run a minimal bubbletea viewer (quits on q/esc)")
-	cmd.Flags().StringVar(&htmlOut, "html", "", "write standalone HTML heatmap (ships in m2)")
+	cmd.Flags().StringVar(&htmlOut, "html", "", "write a standalone shareable HTML heatmap to this path")
 	return cmd
 }
 
@@ -47,11 +48,7 @@ func runHeatmap(sessionPath, repoPath, htmlOut string, interactive bool) error {
 		return err
 	}
 	if htmlOut != "" {
-		out, err := render.RenderHTML(m)
-		if err != nil {
-			return err
-		}
-		return os.WriteFile(htmlOut, []byte(out), 0o644)
+		return os.WriteFile(htmlOut, []byte(render.RenderHTML(m, sessionPath)), 0o644)
 	}
 	if interactive {
 		return render.RunInteractiveHeatmap(m, sessionPath)
