@@ -16,7 +16,7 @@ import (
 )
 
 // Version is the single source of truth for the release tag (see VERSION).
-const Version = "0.1.0"
+const Version = "0.2.0"
 
 func main() {
 	root := &cobra.Command{
