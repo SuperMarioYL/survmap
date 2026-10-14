@@ -4,6 +4,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -92,9 +93,12 @@ func loadTurns(sessionPath string) ([]session.Turn, error) {
 	return turns, nil
 }
 
-// normalizePaths converts every edit's file path to a repo-relative, forward-
-// slash path so it can be looked up in the HEAD tree. Absolute paths are made
-// relative to the repo root; already-relative paths are kept as-is.
+// normalizePaths converts every edit's file path to a canonical repo-relative,
+// forward-slash path so it can be looked up in the HEAD tree. Absolute paths
+// are made relative to the repo root (filepath.Rel also cleans them); already-
+// relative paths are canonicalized with path.Clean so spelling variants of the
+// same file ("./main.go", "sub/../main.go") resolve exactly like "main.go" —
+// both for the HEAD tree lookup and for the session-wide per-file claim set.
 func normalizePaths(repoRoot string, turns []session.Turn) []session.Turn {
 	for ti := range turns {
 		for ei := range turns[ti].Edits {
@@ -104,7 +108,7 @@ func normalizePaths(repoRoot string, turns []session.Turn) []session.Turn {
 					p = rel
 				}
 			}
-			turns[ti].Edits[ei].Path = filepath.ToSlash(p)
+			turns[ti].Edits[ei].Path = path.Clean(filepath.ToSlash(p))
 		}
 	}
 	return turns
