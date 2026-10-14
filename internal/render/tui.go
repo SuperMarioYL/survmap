@@ -46,7 +46,7 @@ func RenderScoreTable(m attribution.SessionSurvivalMap, sessionID string) string
 		sortStrings(paths)
 		for _, p := range paths {
 			row := byFile[p]
-			fmt.Fprintf(&b, "%-6d %-42s %-10s %5d %5s %5s  %s\n",
+			fmt.Fprintf(&b, "%-6d %-42s %-10s %5d %s %s  %s\n",
 				i+1, truncPath(p, 42), trunc(row.tool, 10),
 				row.surv+row.churn,
 				coloredInt(row.surv, styleSurvived),
@@ -176,7 +176,10 @@ func statusLabel(s attribution.Status) string {
 }
 
 func coloredInt(n int, st lipgloss.Style) string {
-	return st.Render(fmt.Sprintf("%d", n))
+	// Pad to the row's column width BEFORE colorizing: Fprintf's %5s would
+	// otherwise pad by byte length, and on a color-enabled terminal the ANSI
+	// escapes already exceed the width — collapsing the SURV/CHRN columns.
+	return st.Render(fmt.Sprintf("%5d", n))
 }
 
 func truncPath(p string, max int) string {
