@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.3.0
+
+- **fix**: an edit recorded under a non-canonical repo-relative path (`./main.go`, `sub/../main.go`) no longer scores the file as 100% churned. Edit paths are canonicalized before scoring, so path spelling can no longer flip the survival verdict.
+- **fix**: the `survmap score` table keeps its SURV/CHRN columns aligned when colors are on (every real terminal); the numbers are width-padded before being colorized.
+- **quality**: the version drift guard now covers the CHANGELOG release section and the product site's `content_version` alongside the `VERSION` file and the in-source constant.
+
 ## v0.2.0
 
 - **fix**: survival scoring now claims each HEAD line at most once per session. Identical content re-added by a later turn (or context lines repeated inside a later `Edit`'s `new_string`) no longer counts as survived twice, so the headline survival ratio can no longer be inflated by rewrite-heavy sessions.
