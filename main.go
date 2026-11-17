@@ -1,9 +1,10 @@
-// Command survmap is a durable-survival-attribution CLI for coding agents.
+// Command survmap is a durable-survival-attribution CLI for Claude Code
+// sessions.
 //
-// It replays a finished Claude Code / Codex session and scores, per turn,
-// whether the lines that turn added survived to the repo's current HEAD or
-// were rolled back / rewritten into white-change. The oracle is git HEAD;
-// everything runs on the host — the session log and the repo never leave it.
+// It replays a finished Claude Code session and scores, per turn, whether the
+// lines that turn added survived to the repo's current HEAD or were rolled back
+// / rewritten into white-change. The oracle is git HEAD; everything runs on the
+// host — the session log and the repo never leave it.
 package main
 
 import (
@@ -16,13 +17,15 @@ import (
 )
 
 // Version is the single source of truth for the release tag (see VERSION).
-const Version = "0.3.0"
+const Version = "0.4.0"
 
-func main() {
+// newRootCmd builds the CLI tree. It is a function so tests can inspect the
+// help surface without executing the command.
+func newRootCmd() *cobra.Command {
 	root := &cobra.Command{
-		Use:     "survmap",
-		Short:   "Survival attribution for coding-agent sessions — which turns survived to git HEAD?",
-		Long: `Survmap replays a finished coding-agent session and attributes each turn's
+		Use:   "survmap",
+		Short: "Survival attribution for Claude Code sessions — which turns survived to git HEAD?",
+		Long: `Survmap replays a finished Claude Code session and attributes each turn's
 edits to git-HEAD survival: green turns produced lines that survived, red turns
 were churn. The oracle is git blame/log at HEAD (machine-checkable). Runs fully
 on-host; the session log and repo never leave the host.
@@ -33,8 +36,11 @@ on-host; the session log and repo never leave the host.
 	}
 	root.AddCommand(cmd.NewScoreCmd())
 	root.AddCommand(cmd.NewHeatmapCmd())
+	return root
+}
 
-	if err := root.Execute(); err != nil {
+func main() {
+	if err := newRootCmd().Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}

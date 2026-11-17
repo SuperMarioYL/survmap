@@ -104,3 +104,31 @@ func TestRenderHTML_EscapesUntrustedInput(t *testing.T) {
 		t.Fatalf("escaped path missing")
 	}
 }
+
+// TestRenderHTML_FullWidthBarsAreValidCSS is the m2 regression: the all-survived
+// and all-churned branches wrote style="width:100%%" from raw literals, so the
+// doubled percent reached the browser, the declaration was dropped and the bar
+// rendered empty.
+func TestRenderHTML_FullWidthBarsAreValidCSS(t *testing.T) {
+	m := attribution.SessionSurvivalMap{
+		HeadSHA: "abcdef1234567890",
+		Turns: []attribution.SurvivalScore{
+			{
+				TurnID: "t1", Status: attribution.StatusSurvived, SurvivedLines: 3,
+				Evidence: []attribution.BlameEvidence{{Path: "main.go", Tool: "Write", Survived: true}},
+			},
+			{
+				TurnID: "t2", Status: attribution.StatusChurned, ChurnedLines: 2,
+				Evidence: []attribution.BlameEvidence{{Path: "main.go", Tool: "Edit"}},
+			},
+		},
+		TotalAdded: 5, TotalSurvived: 3, TotalChurned: 2, SurvivalRatio: 0.6,
+	}
+	out := RenderHTML(m, "session.jsonl")
+	if strings.Contains(out, "100%%") {
+		t.Fatalf(`document contains an escaped "100%%" width — the CSS is invalid`)
+	}
+	if got := strings.Count(out, `style="width:100%"`); got != 2 {
+		t.Fatalf("full-width bars = %d want 2 (all-survived + all-churned)", got)
+	}
+}

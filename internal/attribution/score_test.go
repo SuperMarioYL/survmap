@@ -1,6 +1,7 @@
 package attribution
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
@@ -127,43 +128,6 @@ func TestMatchInOrder_Dedup(t *testing.T) {
 	}
 }
 
-// --- session parse test ---
-
-func TestParseClaudeCodeSession(t *testing.T) {
-	const transcript = `{"type":"user","message":{"role":"user","content":"add foo"}}
-{"type":"assistant","timestamp":"2026-08-15T10:00:00Z","uuid":"u1","message":{"role":"assistant","content":[{"type":"text","text":"ok"},{"type":"tool_use","name":"Write","input":{"file_path":"main.go","content":"package main\n\nfunc foo() {}\nfunc gone() {}\n"}}]}}
-{"type":"assistant","timestamp":"2026-08-15T10:01:00Z","uuid":"u2","message":{"role":"assistant","content":[{"type":"tool_use","name":"Edit","input":{"file_path":"main.go","old_string":"func gone() {}","new_string":"func gone() {}\nfunc extra() {}"}}]}}
-`
-	turns, err := session.Parse(strings.NewReader(transcript))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(turns) != 2 {
-		t.Fatalf("got %d turns want 2", len(turns))
-	}
-	if turns[0].ID != "u1" || len(turns[0].Edits) != 1 {
-		t.Fatalf("turn0 wrong: %+v", turns[0])
-	}
-	want := []string{"package main", "", "func foo() {}", "func gone() {}"}
-	if !equalStrings(turns[0].Edits[0].AddedLines, want) {
-		t.Fatalf("turn0 added=%v want %v", turns[0].Edits[0].AddedLines, want)
-	}
-	if turns[0].Edits[0].LinesRemoved != 0 {
-		t.Fatalf("Write LinesRemoved=%d want 0", turns[0].Edits[0].LinesRemoved)
-	}
-	// turn2 is an Edit: added = new_string lines, removed = old_string lines.
-	if turns[1].Edits[0].Tool != "Edit" {
-		t.Fatalf("turn1 tool=%s want Edit", turns[1].Edits[0].Tool)
-	}
-	wantAdd := []string{"func gone() {}", "func extra() {}"}
-	if !equalStrings(turns[1].Edits[0].AddedLines, wantAdd) {
-		t.Fatalf("turn1 added=%v want %v", turns[1].Edits[0].AddedLines, wantAdd)
-	}
-	if turns[1].Edits[0].LinesRemoved != 1 {
-		t.Fatalf("Edit LinesRemoved=%d want 1", turns[1].Edits[0].LinesRemoved)
-	}
-}
-
 // --- end-to-end integration: real git repo + fake session ---
 
 func TestScore_RealRepoEndToEnd(t *testing.T) {
@@ -233,22 +197,65 @@ func TestScore_RealRepoEndToEnd(t *testing.T) {
 	}
 }
 
+// TestScore_TwoTurnsInOneFunctionHaveNoPhantomChurn is the m1 end-to-end
+// regression: two one-line edits inside the same function, whose final content
+// is at HEAD, used to report 9 added lines per turn and "50% of added lines were
+// churn" because each Edit's whole new_string was counted as added. Honest
+// numbers are one added line per turn, both survived, zero churn.
+func TestScore_TwoTurnsInOneFunctionHaveNoPhantomChurn(t *testing.T) {
+	body1 := "func compute(a int) int {\n\tx := a + 1\n\ty := x * 2\n\tz := y - 3\n\treturn z\n}"
+	body2 := strings.Replace(body1, "x := a + 1", "x := a + 2", 1)
+	body3 := strings.Replace(body2, "y := x * 2", "y := x * 3", 1)
+
+	editTurn := func(uuid, oldText, newText string) string {
+		raw, err := json.Marshal(map[string]any{
+			"type": "assistant",
+			"uuid": uuid,
+			"message": map[string]any{
+				"role": "assistant",
+				"content": []map[string]any{{
+					"type": "tool_use",
+					"name": "Edit",
+					"input": map[string]any{
+						"file_path":  "main.go",
+						"old_string": oldText,
+						"new_string": newText,
+					},
+				}},
+			},
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		return string(raw)
+	}
+	transcript := editTurn("u1", body1, body2) + "\n" + editTurn("u2", body2, body3) + "\n"
+
+	turns, err := session.Parse(strings.NewReader(transcript))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(turns) != 2 {
+		t.Fatalf("got %d turns want 2", len(turns))
+	}
+	head := map[string][]git.BlameLine{"main.go": bl(strings.Split(body3, "\n")...)}
+	m := ScoreAgainstHEAD(turns, head, "HEADSHA")
+
+	if m.TotalAdded != 2 || m.TotalSurvived != 2 || m.TotalChurned != 0 {
+		t.Fatalf("totals added/survived/churned = %d/%d/%d want 2/2/0 — unchanged context must not be added (or churned)",
+			m.TotalAdded, m.TotalSurvived, m.TotalChurned)
+	}
+	for i, sc := range m.Turns {
+		if sc.Status != StatusSurvived || sc.SurvivedLines != 1 {
+			t.Fatalf("turn %d = %s survived=%d, want survived/1", i+1, sc.Status, sc.SurvivedLines)
+		}
+	}
+}
+
 func writeBilly(root, rel, content string) error {
 	full := filepath.Join(root, rel)
 	if err := os.MkdirAll(filepath.Dir(full), 0o755); err != nil {
 		return err
 	}
 	return os.WriteFile(full, []byte(content), 0o644)
-}
-
-func equalStrings(a, b []string) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i := range a {
-		if a[i] != b[i] {
-			return false
-		}
-	}
-	return true
 }

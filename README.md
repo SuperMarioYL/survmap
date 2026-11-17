@@ -32,6 +32,8 @@ Survmap 从保存的 Claude Code 轨迹提取文件编辑，将其中实质内�
 
 会话解析器提取 Write、Edit、MultiEdit 与 NotebookEdit；Git 读取器获取 HEAD 内容与尽力解析的 blame 数据。评分器按顺序匹配实质内容行，汇总 survived、churned、partial 和 skipped。
 
+一次 Edit 只把 `new_string` 中真正新增的行计入评分：`old_string` 里已存在的上下文行不算新增，长函数中的单行改动既不会虚增新增行数，也不会让下一轮的上下文变成白改。
+
 | 组件 | 职责 |
 | --- | --- |
 | `Transcript edits` | internal/session |

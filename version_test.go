@@ -28,7 +28,7 @@ func TestVersionLockstep(t *testing.T) {
 	if !regexp.MustCompile(`^\d+\.\d+\.\d+$`).MatchString(Version) {
 		t.Fatalf("Version %q is not a bare semver (MAJOR.MINOR.PATCH)", Version)
 	}
-	const releaseVersion = "0.3.0"
+	const releaseVersion = "0.4.0"
 	if Version != releaseVersion {
 		t.Fatalf("Version %q, want %q — update this guard when cutting the next release", Version, releaseVersion)
 	}

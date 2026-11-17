@@ -23,8 +23,11 @@ type FileEdit struct {
 	Path string
 	// Tool is the originating tool name: Write, Edit, MultiEdit, NotebookEdit.
 	Tool string
-	// AddedLines holds the content of lines introduced by this edit. The
-	// attribution core matches these against the file's lines at HEAD.
+	// AddedLines holds the content of lines introduced by this edit. For Edit and
+	// MultiEdit only lines absent from the replaced old_string count; Write and
+	// NotebookEdit carry their whole new content because the transcript holds no
+	// prior text for them. The attribution core matches these against the file's
+	// lines at HEAD.
 	AddedLines []string
 	// LinesAdded is len(AddedLines).
 	LinesAdded int
@@ -193,9 +196,10 @@ func parseEdit(name string, raw json.RawMessage) (FileEdit, bool) {
 			return fe, false // no-op edit
 		}
 		fe.Path = in.FilePath
-		fe.AddedLines = splitLines(in.NewString)
+		var removed []string
+		fe.AddedLines, removed = introducedLines(in.OldString, in.NewString)
 		fe.LinesAdded = len(fe.AddedLines)
-		fe.LinesRemoved = len(splitLines(in.OldString))
+		fe.LinesRemoved = len(removed)
 	case "MultiEdit":
 		var in multiEditInput
 		if err := json.Unmarshal(raw, &in); err != nil || in.FilePath == "" {
@@ -206,8 +210,9 @@ func parseEdit(name string, raw json.RawMessage) (FileEdit, bool) {
 			if e.NewString == e.OldString {
 				continue
 			}
-			fe.AddedLines = append(fe.AddedLines, splitLines(e.NewString)...)
-			fe.LinesRemoved += len(splitLines(e.OldString))
+			added, removed := introducedLines(e.OldString, e.NewString)
+			fe.AddedLines = append(fe.AddedLines, added...)
+			fe.LinesRemoved += len(removed)
 		}
 		fe.LinesAdded = len(fe.AddedLines)
 	case "NotebookEdit":
@@ -222,6 +227,51 @@ func parseEdit(name string, raw json.RawMessage) (FileEdit, bool) {
 		return fe, false
 	}
 	return fe, fe.LinesAdded > 0
+}
+
+// introducedLines splits an Edit's old/new text into the lines the edit actually
+// introduced and removed. Claude Code records the whole replacement text, so
+// new_string normally repeats unchanged surrounding lines as context; counting
+// those as added content inflates the survival ratio and, because the scorer
+// claims each HEAD line once per session, turns the next turn's context copies
+// into phantom churn. A line present on both sides is unchanged even when it
+// moved, so it is neither added nor removed. Lines are compared with trailing
+// whitespace trimmed — the same normalization the scorer applies to HEAD lines
+// (internal/attribution lineEq), so a trailing-space copy is not "new" content.
+func introducedLines(oldText, newText string) (added, removed []string) {
+	oldLines := splitLines(oldText)
+	newLines := splitLines(newText)
+	oldRemaining := countByContent(oldLines)
+	newRemaining := countByContent(newLines)
+	for _, ln := range newLines {
+		k := trimRightSpace(ln)
+		if oldRemaining[k] > 0 {
+			oldRemaining[k]--
+			continue
+		}
+		added = append(added, ln)
+	}
+	for _, ln := range oldLines {
+		k := trimRightSpace(ln)
+		if newRemaining[k] > 0 {
+			newRemaining[k]--
+			continue
+		}
+		removed = append(removed, ln)
+	}
+	return added, removed
+}
+
+func countByContent(lines []string) map[string]int {
+	counts := make(map[string]int, len(lines))
+	for _, ln := range lines {
+		counts[trimRightSpace(ln)]++
+	}
+	return counts
+}
+
+func trimRightSpace(s string) string {
+	return strings.TrimRight(s, " \t\r")
 }
 
 // splitLines splits content on newlines, dropping a single trailing empty line

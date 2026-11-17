@@ -44,6 +44,14 @@ func RenderScoreTable(m attribution.SessionSurvivalMap, sessionID string) string
 			paths = append(paths, p)
 		}
 		sortStrings(paths)
+		if len(paths) == 0 {
+			// A turn whose added lines are all formatting noise carries no
+			// evidence entry, so there is no path to show. Print the row anyway:
+			// dropping it left the table starting at "2" with no explanation.
+			fmt.Fprintf(&b, "%-6d %-42s %-10s %5d %5d %5d  %s\n",
+				i+1, "-", "-", 0, 0, 0, statusLabel(sc.Status))
+			continue
+		}
 		for _, p := range paths {
 			row := byFile[p]
 			fmt.Fprintf(&b, "%-6d %-42s %-10s %5d %s %s  %s\n",

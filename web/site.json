@@ -11,7 +11,7 @@
   "meta": {
     "visual_style": "neon-particle",
     "demo_source": "docs/demo-results.json",
-    "content_version": "0.3.0"
+    "content_version": "0.4.0"
   },
   "hero": {
     "headline": {
@@ -140,8 +140,8 @@
           "zh": "处理过程"
         },
         "body": {
-          "en": "The session parser extracts Write, Edit, MultiEdit and NotebookEdit records. The Git reader obtains HEAD content and best-effort blame data. The scorer matches substantive lines in order, then aggregates survived, churned, partial and skipped turns.",
-          "zh": "会话解析器提取 Write、Edit、MultiEdit 与 NotebookEdit；Git 读取器获取 HEAD 内容与尽力解析的 blame 数据。评分器按顺序匹配实质内容行，汇总 survived、churned、partial 和 skipped。"
+          "en": "The session parser extracts Write, Edit, MultiEdit and NotebookEdit records. The Git reader obtains HEAD content and best-effort blame data. The scorer matches substantive lines in order, then aggregates survived, churned, partial and skipped turns. An Edit contributes only the lines its new_string does not already carry in old_string, so unchanged context never counts as added content.",
+          "zh": "会话解析器提取 Write、Edit、MultiEdit 与 NotebookEdit；Git 读取器获取 HEAD 内容与尽力解析的 blame 数据。评分器按顺序匹配实质内容行，汇总 survived、churned、partial 和 skipped。一次 Edit 只把 new_string 中真正新增的行计入评分，old_string 里的上下文行不算新增。"
         },
         "image": {
           "light": "/assets/presentation/process-light.svg",
@@ -162,8 +162,8 @@
           "zh": "Survmap 的工作方式"
         },
         "body": {
-          "en": "The session parser extracts Write, Edit, MultiEdit and NotebookEdit records. The Git reader obtains HEAD content and best-effort blame data. The scorer matches substantive lines in order, then aggregates survived, churned, partial and skipped turns.",
-          "zh": "会话解析器提取 Write、Edit、MultiEdit 与 NotebookEdit；Git 读取器获取 HEAD 内容与尽力解析的 blame 数据。评分器按顺序匹配实质内容行，汇总 survived、churned、partial 和 skipped。"
+          "en": "The session parser extracts Write, Edit, MultiEdit and NotebookEdit records. The Git reader obtains HEAD content and best-effort blame data. The scorer matches substantive lines in order, then aggregates survived, churned, partial and skipped turns. An Edit contributes only the lines its new_string does not already carry in old_string, so unchanged context never counts as added content.",
+          "zh": "会话解析器提取 Write、Edit、MultiEdit 与 NotebookEdit；Git 读取器获取 HEAD 内容与尽力解析的 blame 数据。评分器按顺序匹配实质内容行，汇总 survived、churned、partial 和 skipped。一次 Edit 只把 new_string 中真正新增的行计入评分，old_string 里的上下文行不算新增。"
         },
         "image": {
           "light": "/assets/presentation/architecture-light.svg",

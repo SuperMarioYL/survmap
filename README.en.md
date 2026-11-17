@@ -32,6 +32,8 @@ The final diff hides intermediate rewrites. A per-turn content-presence report h
 
 The session parser extracts Write, Edit, MultiEdit and NotebookEdit records. The Git reader obtains HEAD content and best-effort blame data. The scorer matches substantive lines in order, then aggregates survived, churned, partial and skipped turns.
 
+An Edit contributes only the lines its `new_string` does not already carry in `old_string`: unchanged context around the change is not added content, so a one-line change inside a long function neither inflates the added-line count nor turns the next turn's context into churn.
+
 | Component | Responsibility |
 | --- | --- |
 | `Transcript edits` | internal/session |

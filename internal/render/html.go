@@ -68,9 +68,9 @@ footer { margin-top: 28px; color: #484f58; font-size: 12px; }
 		case total == 0:
 			bar = `<div class="bar"><i class="ss"></i></div>`
 		case sc.ChurnedLines == 0:
-			bar = `<div class="bar"><i class="sg" style="width:100%%"></i></div>`
+			bar = `<div class="bar"><i class="sg" style="width:100%"></i></div>`
 		case sc.SurvivedLines == 0:
-			bar = `<div class="bar"><i class="sr" style="width:100%%"></i></div>`
+			bar = `<div class="bar"><i class="sr" style="width:100%"></i></div>`
 		default:
 			g := 100 * sc.SurvivedLines / total
 			bar = fmt.Sprintf(`<div class="bar"><i class="sg" style="width:%d%%"></i><i class="sr" style="width:%d%%"></i></div>`, g, 100-g)

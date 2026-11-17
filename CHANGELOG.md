@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.4.0
+
+- **fix**: an `Edit` now scores only the lines it actually introduces. Unchanged context lines copied into `new_string` are no longer counted as added, so a one-line change inside a function neither inflates the added-line count nor turns the next turn's context copies into churn. Two one-line edits in the same function used to read "50% of added lines were churn"; they now read 0%.
+- **fix**: the standalone HTML heatmap renders a full bar for all-survived and all-churned turns. Two raw `width:100%%` literals produced invalid CSS, so those bars rendered empty.
+- **fix**: a turn whose edits carry only blank lines or bare braces keeps a visible `skipped` row in the `survmap score` table instead of silently disappearing while the summary still counts it.
+- **quality**: the transcript parser gets dedicated contract tests (MultiEdit, NotebookEdit, no-op edits, malformed records), and the CLI help now names Claude Code transcripts only — the same boundary the README and site already state.
+
 ## v0.3.0
 
 - **fix**: an edit recorded under a non-canonical repo-relative path (`./main.go`, `sub/../main.go`) no longer scores the file as 100% churned. Edit paths are canonicalized before scoring, so path spelling can no longer flip the survival verdict.
